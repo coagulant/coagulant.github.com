@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>HttpOnly куки и с чем их едят</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Илья Барышев">
+
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://codecoffee.ru/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/pygments.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/my.css" type="text/css"/>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="http://codecoffee.ru/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="http://codecoffee.ru/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="http://codecoffee.ru/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="http://codecoffee.ru/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="http://codecoffee.ru/rss.xml" type="application/rss+xml" rel="alternate" title="Блог Ильи Барышева RSS Feed"/>
+</head>
+
+<body>
+
+<div class="container-fluid all-content">
+    <div class="row">
+        <header class="site-title span8 offset4">
+            <h1 class="site-title-main"><a href="http://codecoffee.ru">Блог Ильи Барышева</a></h1>
+            <span class="site-title-sub">О веб-разработке и не только…</span>
+        </header>
+
+        <div class="span8" id="content">
+<section id="content">
+    <article class="article">
+        <header>
+            <h1>
+                HttpOnly куки и с чем их едят
+            </h1>
+        </header>
+        <div class="entry-content">
+        <p>HttpOnly cookie — это такие куки, которые невозможно прочитать с помощью
+javascript, но доступные серверным скриптам, как и любые другие.
+Несмотря на то, что это совсем не новая технология (HttpOnly cookie
+появились 8 лет назад в IE6 SP1), далеко не все знают, почему их
+обязательно стоит использовать.</p>
+<h3>Зачем это нужно</h3>
+<p>Куки, недоступные из джаваскипта, помогут защитить от XSS-атак, как
+второй рубеж обороны от злоумышленников. Прокравшийся на страницу
+вредоносный код не сможет утащить пользовательские куки с помощью
+<code>document.cookie</code>.</p>
+<h3>Где это работает</h3>
+<p>Основная мысль: <em>это работает во всех популярных и современных
+браузерах</em> (IE6+, Firefox 2.0+, Chrome 1.0+, Opera 9.5+, Safari 4.0+)
+Подробнее можно ознакомиться на сайте <a href="http://www.browserscope.org/">browserscope</a> (раздел
+Security).</p>
+<p>HttpOnly cookie <a href="http://php.net/manual/en/function.setcookie.php">легко установить в php</a>, <a href="http://docs.djangoproject.com/en/dev/ref/request-response/#django.http.HttpResponse.set_cookie">django</a>. Чтобы
+установить куки собственноручно через передачу заголовка ответа,
+достаточко добавить параметр <code>; HttpOnly</code></p>
+<div class="highlight"><pre><span class="n">Set</span><span class="o">-</span><span class="n">Cookie</span><span class="o">:</span> <span class="o">=</span><span class="p">[;</span> <span class="o">=</span><span class="p">]</span>
+<span class="p">[;</span> <span class="n">expires</span><span class="o">=</span><span class="p">][;</span> <span class="n">domain</span><span class="o">=</span><span class="p">]</span>
+<span class="p">[;</span> <span class="n">path</span><span class="o">=</span><span class="p">][;</span> <span class="n">secure</span><span class="p">][;</span> <span class="n">HttpOnly</span><span class="p">]</span>
+</pre></div>
+
+
+<p><a href="http://prophet.ru/demos/cookie/">Демо</a></p>
+<p><a href="http://www.owasp.org/index.php/HttpOnly">Подробно про HttpOnly cookie</a> на сайте Open Web Application Security Project</p>
+        </div>
+        <div class="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+               var disqus_identifier = "2010/12/httponly-kuki-i-s-chem-ikh-ediat/";
+               (function() {
+                    var dsq = document.createElement('script');
+                    dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://ilyabaryshev.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] ||
+                     document.getElementsByTagName('body')[0]).appendChild(dsq);
+              })();
+            </script>
+        </div>
+    </article>
+</section>
+        </div>
+
+        <div class="span4" id="sidebar">
+<div class="twitter-widget">
+<a class="twitter-timeline" href="https://twitter.com/coagulant"
+   data-widget-id="246305220399861761">Твитер @coagulant</a>
+</div>
+<script>!function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "http://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }
+}(document, "script", "twitter-wjs");</script>        </div>
+
+    </div>
+
+    <hr>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'ilyabaryshev';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+<script src="http://codecoffee.ru/theme/js/jquery-1.7.2.min.js"></script>
+<script src="http://codecoffee.ru/theme/js/bootstrap.min.js"></script>
+</body>
+</html>

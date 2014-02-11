@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Блог Ильи Барышева - html5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Илья Барышев">
+
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://codecoffee.ru/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/pygments.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/my.css" type="text/css"/>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="http://codecoffee.ru/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="http://codecoffee.ru/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="http://codecoffee.ru/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="http://codecoffee.ru/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="http://codecoffee.ru/rss.xml" type="application/rss+xml" rel="alternate" title="Блог Ильи Барышева RSS Feed"/>
+</head>
+
+<body>
+
+<div class="container-fluid all-content">
+    <div class="row">
+        <header class="site-title span8 offset4">
+            <h1 class="site-title-main"><a href="http://codecoffee.ru">Блог Ильи Барышева</a></h1>
+            <span class="site-title-sub">О веб-разработке и не только…</span>
+        </header>
+
+        <div class="span8" id="content">
+        <article class="article">
+            <h2><a href="http://codecoffee.ru/2010/11/firefox-2-i-html5/">Firefox 2 и HTML5</a></h2>
+            <span class="article-date">21 November 2010</span>
+            <div class="summary"><p>Сейчас для многих HTML5 это такой всеобщий «тренд» веб-разработки и
+просто «buzzword». Все радуются за новые и полезные семантические
+теги разметки <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code> и даже
+<code>&lt;aside&gt;</code>. Но не все ещё знают о том, какие проблемы с обратной
+совместимостью устаревших браузеров по-прежнему существуют.</p>
+<h3>Ослик</h3>
+<p>То, что Internet Explorer вплоть до 9 версии не умеет применять стили к
+неизвестным тегам без специальных ухищрений, давно известно. Для обхода
+этого недоразумения существует популярное решение <a href="http://code.google.com/p/html5shiv/">html5shiv</a>.
+Хитрость в том, чтобы динамически создать новый элемент, тогда explorer
+волшебным образом застайлит все последующие его вхождения.</p>
+<h3>Firefox 2</h3>
+<p>Куда менее известно о том, что Firefox 2 тоже <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=311366">не дружит с незнакомыми
+ему тегами</a>:</p>
+<blockquote>
+<p>Firefox 2 (а также любой другой браузер на движке Gecko версии младше
+1.9b5) имеет баг в разборе HTML: все неизвестные теги принудительно
+закрываются, как только парсер встречает блочный элемент (p, h1, div и
+т.п.).</p>
+</blockquote>
+<p>На данный момент доля второй ветки FF <a href="http://goo.gl/Gxel9">в рунете</a> и <a href="http://goo.gl/9DwO4">в мире</a>
+составляет меньше процента (0.4%). В то время как доля IE6 <a href="http://goo.gl/NIMgf">в 10 раз
+больше</a> - около 5%. Поэтому, неудивительно, что проблема кажется
+надуманной. Тем не менее, если вы разрабатываете популярный ресурс с
+многотысячной посещаемостью, число таких людей будет исчисляться сотнями
+в неделю. Каждый из них вместо свёрстанного сайта увидит нечто
+совершенно непотребное и скорее всего сразу уйдёт.</p>
+<p><img alt="Firefox 2: Вот как всё разваливается" src="http://prophet.ru/media/firefox_2.0.0.20-300x225.png" />
+<img alt="Firefox 3: Так должно выглядеть на самом деле" src="http://prophet.ru/media/firefox_3.0-300x225.png" /></p>
+<p>Есть несколько способов исправить проблему, со своими плюсами и
+минусами, как водится.</p>
+<h4>Деградация</h4>
+<p>Заменяем все новые теги на блочные <code>&lt;div&gt;</code> для Firefox 2. Придётся
+применить пресловутый browser sniffing, а значит есть риск ошибиться при
+разборе User Agent. Кроме того, css и весь javascript не должен быть
+привязан к названиям тегов (вообще, это хороший стиль). Ну и кэшировать
+такие страницы придётся отдельно.</p>
+<h4>Переходим на XHTML</h4>
+<p>Отдаём фаерфоксу заголовок <code>application/xhtml+xml</code> и баг пропадает.
+Кроме того, что в данном методе присутствует browser sniffing, xhtml
+strict mode чреват тем, что из-за ошибочной вёрстки посетитель не увидит
+вообще ничего, кроме parse error (документ должен быть well-formed).
+<a href="http://remysharp.com/2009/04/14/html5-and-firefox2/">Пример в блоге Remy Sharp</a></p>
+<h4>Используем JS</h4>
+<p>С помощью javasctipt можно обойти DOM-дерево и убрать лишние закрывающие
+теги, которые проставил Firefox. Готового решения нет, поскольку
+определить то, что тег закрыт преждевременно по ошибке нетривиально.
+<a href="http://blog.whatwg.org/supporting-new-elements-in-firefox-2">Пример в блоге WHATWG</a>.</p>
+<h3>Итого</h3>
+<p>Полезно заранее определить границы кроссбраузерности и определить
+<a href="http://developer.yahoo.com/yui/articles/gbs/">степень поддержки тех или иных версий браузеров</a>. Если вы планируете
+использовать новые теги в вёрстке, незначительная часть ваших
+пользователей увидят ваш сайт совсем не так, как вы этого могли ожидать,
+если об этом не позаботиться. Внедряя новые «примочки», полезно не
+забывать об обратной совместимости, ведь не все могут легко установить
+себе современный браузер.</p></div>
+<div class="article-tags">
+    <i class="icon-tag"></i>
+	<a href="http://codecoffee.ru/tag/explorer.html">explorer</a>
+	<a href="http://codecoffee.ru/tag/firefox.html">firefox</a>
+	<a href="http://codecoffee.ru/tag/html5.html">html5</a>
+</div>
+            <a class="comments-link" href="http://codecoffee.ru/2010/11/firefox-2-i-html5/#disqus_thread">Комментарии</a>
+        </article>
+        <hr />
+
+        </div>
+
+        <div class="span4" id="sidebar">
+<div class="twitter-widget">
+<a class="twitter-timeline" href="https://twitter.com/coagulant"
+   data-widget-id="246305220399861761">Твитер @coagulant</a>
+</div>
+<script>!function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "http://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }
+}(document, "script", "twitter-wjs");</script>        </div>
+
+    </div>
+
+    <hr>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'ilyabaryshev';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+<script src="http://codecoffee.ru/theme/js/jquery-1.7.2.min.js"></script>
+<script src="http://codecoffee.ru/theme/js/bootstrap.min.js"></script>
+</body>
+</html>

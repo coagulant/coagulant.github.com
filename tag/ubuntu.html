@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Блог Ильи Барышева - ubuntu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Илья Барышев">
+
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://codecoffee.ru/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/pygments.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/my.css" type="text/css"/>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="http://codecoffee.ru/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="http://codecoffee.ru/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="http://codecoffee.ru/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="http://codecoffee.ru/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="http://codecoffee.ru/rss.xml" type="application/rss+xml" rel="alternate" title="Блог Ильи Барышева RSS Feed"/>
+</head>
+
+<body>
+
+<div class="container-fluid all-content">
+    <div class="row">
+        <header class="site-title span8 offset4">
+            <h1 class="site-title-main"><a href="http://codecoffee.ru">Блог Ильи Барышева</a></h1>
+            <span class="site-title-sub">О веб-разработке и не только…</span>
+        </header>
+
+        <div class="span8" id="content">
+        <article class="article">
+            <h2><a href="http://codecoffee.ru/2010/12/vpc-ec3s1r-i-ubunta-1010/">VPC-EC3S1R и Убунта 10.10</a></h2>
+            <span class="article-date">15 December 2010</span>
+            <div class="summary"><p>Взамен <a href="http://www.trustedreviews.com/laptops/review/2005/09/07/Fujitsu-Siemens-AMILO-M3438G-Gaming-Notebook/p1">старого ноута</a> приобрёл новый <a href="http://market.yandex.ru/model.xml?modelid=6496796">VAIO серии E</a>. Машинка отличная,
+а пока пара советов для убунтоводов, обзаведшихся ноутом сони, почерпнутых в <a href="http://outhereinthefield.wordpress.com/2010/11/03/ubuntu-10-4-lucid-lynx-on-vaio-vpcea36fg/">одном из
+блогов</a>.</p>
+<p><img alt="Sony VAIO VPC-EC3S1R" src="http://prophet.ru/media/vaio.jpg" /></p>
+<p>Под свежеустановленным
+Мавериком (10.10) почти всё завелось "из коробки": видео, аудио,
+вебкамера, но не обошлось и без досадных недоразумений в виде нерабочего
+тачпада и кнопок управления яркости.</p>
+<h3>Убунта и яркость экрана</h3>
+<p>Сидеть за дисплеем со 100-процентной яркостью совершенно невозможно,
+поэтому, пока не отказали глаза срочно понижаем её в меню "Система →
+Параметры → Управления питанием". Данный трюк не проходит, если питание
+от сети отсутствует, поэтому надо оживить кнопки Fn+F5 и Fn+F6,
+отвечающие за яркость.</p>
+<p>1) Правим файл <code>/etc/acpi/events/sony-brightness-down</code>, который будет выполняться при
+нажатии Fn+F5.</p>
+<div class="highlight"><pre><span class="cp"># /etc/acpi/events/sony-brightness-down</span>
+<span class="n">event</span><span class="o">=</span><span class="n">sony</span><span class="o">/</span><span class="n">hotkey</span> <span class="n">SNC</span> <span class="mo">00000001</span> <span class="mo">00000010</span>
+<span class="n">action</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">acpi</span><span class="o">/</span><span class="n">brightdown</span><span class="p">.</span><span class="n">sh</span>
+</pre></div>
+
+
+<p>Код клавиши может отличаться для других моделей ноутбуков Сони (можно
+определить с помощью команды <code>acpi_listen</code>)</p>
+<p>2) Правим скрипт <code>/etc/acpi/brightdown.sh</code>, который понижает яркость</p>
+<div class="highlight"><pre><span class="c">#!/bin/bash</span>
+<span class="nv">curr</span><span class="o">=</span><span class="sb">`</span>cat /sys/class/backlight/acpi_video0/actual_brightness<span class="sb">`</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$curr</span> -gt 0 <span class="o">]</span>; <span class="k">then</span>
+<span class="nv">curr</span><span class="o">=</span><span class="k">$((</span>curr-1<span class="k">))</span>;
+<span class="nb">echo</span> <span class="nv">$curr</span>  &gt; /sys/class/backlight/acpi_video0/brightness;
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>Главное, не забыть про права на исполнение.</p>
+<p>3) Аналогично редактируем файл <code>/etc/acpi/events/sony-brightness-up</code></p>
+<div class="highlight"><pre><span class="cp"># /etc/acpi/events/sony-brightness-up</span>
+<span class="n">event</span><span class="o">=</span><span class="n">sony</span><span class="o">/</span><span class="n">hotkey</span> <span class="n">SNC</span> <span class="mo">00000001</span> <span class="mo">00000011</span>
+<span class="n">action</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">acpi</span><span class="o">/</span><span class="n">brightup</span><span class="p">.</span><span class="n">sh</span>
+</pre></div>
+
+
+<p>4) А вот скрипт повышения яркости для файла <code>/etc/acpi/brightup.sh</code></p>
+<div class="highlight"><pre><span class="c">#!/bin/bash</span>
+<span class="nv">curr</span><span class="o">=</span><span class="sb">`</span>cat /sys/class/backlight/acpi_video0/actual_brightness<span class="sb">`</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$curr</span> -lt 8 <span class="o">]</span>; <span class="k">then</span>
+<span class="nv">curr</span><span class="o">=</span><span class="k">$((</span>curr+1<span class="k">))</span>;
+<span class="nb">echo</span> <span class="nv">$curr</span>  &gt; /sys/class/backlight/acpi_video0/brightness;
+<span class="k">fi</span>
+</pre></div>
+
+
+<h3>Убунта и тачпад</h3>
+<p>Тачпад особенно не нужен на 17-дюймовом ноуте, который заменяет десктоп,
+но для порядка надо оживить и его. Нужно отредактировать
+<code>/etc/default/grub</code>, добавив следующую строчку</p>
+<div class="highlight"><pre><span class="n">GRUB_CMDLINE_LINUX</span><span class="o">=</span><span class="err">”</span><span class="n">i8042</span><span class="p">.</span><span class="n">noloop</span> <span class="n">i8042</span><span class="p">.</span><span class="n">nomux</span> <span class="n">i8042</span><span class="p">.</span><span class="n">reset</span> <span class="n">i8042</span><span class="p">.</span><span class="n">nopnp</span> <span class="n">splash</span><span class="s">&quot;</span>
+</pre></div>
+
+
+<p>После этого надо пересоздать grub.conf</p>
+<div class="highlight"><pre><span class="n">sudo</span> <span class="n">update</span><span class="o">-</span><span class="n">grub</span>
+</pre></div>
+
+
+<p>После этого перезагружаемся и тачпад работает. Удачной работы.</p></div>
+<div class="article-tags">
+    <i class="icon-tag"></i>
+	<a href="http://codecoffee.ru/tag/ubuntu.html">ubuntu</a>
+</div>
+            <a class="comments-link" href="http://codecoffee.ru/2010/12/vpc-ec3s1r-i-ubunta-1010/#disqus_thread">Комментарии</a>
+        </article>
+        <hr />
+        <article class="article">
+            <h2><a href="http://codecoffee.ru/2010/11/kak-dobavit-sertifikat-ssl-v-chrome-pod-ubuntu/">Как добавить сертификат SSL в Chrome под Ubuntu</a></h2>
+            <span class="article-date">12 November 2010</span>
+            <div class="summary"><p>Хром очень печётся о безопасности пользователя, поэтому иногда можно
+увидеть вместо сайта вот такое предостережение:</p>
+<p><img alt="Предупреждение Chrome о небезопасности сертификата" src="http://prophet.ru/media/chrome_security_warning1-300x168.png" /></p>
+<p>Как правило, владельцы ресурса используют самоподписанный сертификат, что
+само по себе угрозой не является, но вызывает раздражение, если видишь
+эту кровавую страницу каждый раз при посещении, например,
+интранет-сайта. В фаерфоксе подобная проблема решается прямо в браузере
+несколькими кликами, нужно всего лишь добавить сертификат к доверенным.
+Любителям хрома под линукс придётся <a href="http://code.google.com/p/chromium/wiki/LinuxCertManagement">использовать командную строку</a>.</p>
+<h3>Решение</h3>
+<p>Некто Алекс придумал <a href="http://blog.avirtualhome.com/2010/02/02/adding-ssl-certificates-to-google-chrome-linux-ubuntu/">способ немного автоматизировать процесс</a>:</p>
+<ol>
+<li>
+<p>Ставим себе libnss3-tools:</p>
+<div class="highlight"><pre><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libnss3</span><span class="o">-</span><span class="n">tools</span>
+</pre></div>
+
+
+</li>
+<li>
+<p>Создаём исполняемый файл import-cert.sh</p>
+<div class="highlight"><pre><span class="c">#!/bin/sh</span>
+<span class="c">#</span>
+<span class="c"># usage: import-cert.sh remote.host.name [port]</span>
+<span class="c">#</span>
+<span class="nv">REMHOST</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">REMPORT</span><span class="o">=</span><span class="k">${</span><span class="nv">2</span><span class="k">:-</span><span class="nv">443</span><span class="k">}</span>
+<span class="nb">exec </span>6&gt;&amp;1
+<span class="nb">exec</span> &gt; <span class="nv">$REMHOST</span>
+<span class="nb">echo</span> | openssl s_client -connect <span class="k">${</span><span class="nv">REMHOST</span><span class="k">}</span>:<span class="k">${</span><span class="nv">REMPORT</span><span class="k">}</span> 2&gt;&amp;1 |sed -ne <span class="s1">&#39;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#39;</span>
+certutil -d sql:<span class="nv">$HOME</span>/.pki/nssdb -A -t TC -n <span class="s2">&quot;$REMHOST&quot;</span> -i <span class="nv">$REMHOST</span>
+<span class="nb">exec </span>1&gt;&amp;6 6&gt;&amp;-
+</pre></div>
+
+
+</li>
+<li>
+<p>Запускаем скрипт:</p>
+<div class="highlight"><pre><span class="n">import</span><span class="o">-</span><span class="n">cert</span><span class="p">.</span><span class="n">sh</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span> <span class="mi">443</span>
+</pre></div>
+
+
+<p>(где 443 - необязательный параметр, порт SSL) Вот и всё, сертификат
+добавился в <a href="https://wiki.mozilla.org/NSS_Shared_DB_And_LINUX">NSS Shared DB</a>, mission accomplished.</p>
+</li>
+</ol>
+<h3>На всякий случай</h3>
+<p>Если что-то пошло не так, всегда можно через консоль посмотреть, какие
+сертификаты добавлены:</p>
+<div class="highlight"><pre><span class="n">certutil</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">d</span> <span class="n">sql</span><span class="o">:</span><span class="err">$</span><span class="n">HOME</span><span class="o">/</span><span class="p">.</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span>
+</pre></div>
+
+
+<p>или удалить негодный сертификат:</p>
+<div class="highlight"><pre><span class="n">certutil</span> <span class="o">-</span><span class="n">D</span> <span class="o">-</span><span class="n">n</span> <span class="err">имя</span><span class="n">_</span><span class="err">сертификата</span> <span class="o">-</span><span class="n">d</span> <span class="n">sql</span><span class="o">:</span><span class="err">$</span><span class="n">HOME</span><span class="o">/</span><span class="p">.</span><span class="n">pki</span><span class="o">/</span><span class="n">nssdb</span>
+</pre></div>
+
+
+<h3>Итого</h3>
+<p>Пока приходится использовать вот такие «костыли», но, скорее всего, в
+будущем появится нормальный менеджер сертификатов под Linux и данный
+скрипт будет более не нужен, на что я очень надеюсь.</p></div>
+<div class="article-tags">
+    <i class="icon-tag"></i>
+	<a href="http://codecoffee.ru/tag/chrome.html">chrome</a>
+	<a href="http://codecoffee.ru/tag/ssl.html">ssl</a>
+	<a href="http://codecoffee.ru/tag/ubuntu.html">ubuntu</a>
+</div>
+            <a class="comments-link" href="http://codecoffee.ru/2010/11/kak-dobavit-sertifikat-ssl-v-chrome-pod-ubuntu/#disqus_thread">Комментарии</a>
+        </article>
+        <hr />
+
+        </div>
+
+        <div class="span4" id="sidebar">
+<div class="twitter-widget">
+<a class="twitter-timeline" href="https://twitter.com/coagulant"
+   data-widget-id="246305220399861761">Твитер @coagulant</a>
+</div>
+<script>!function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "http://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }
+}(document, "script", "twitter-wjs");</script>        </div>
+
+    </div>
+
+    <hr>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'ilyabaryshev';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+<script src="http://codecoffee.ru/theme/js/jquery-1.7.2.min.js"></script>
+<script src="http://codecoffee.ru/theme/js/bootstrap.min.js"></script>
+</body>
+</html>

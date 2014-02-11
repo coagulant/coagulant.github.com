@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Боремся с Clickjacking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Илья Барышев">
+
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://codecoffee.ru/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/pygments.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/my.css" type="text/css"/>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="http://codecoffee.ru/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="http://codecoffee.ru/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="http://codecoffee.ru/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="http://codecoffee.ru/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="http://codecoffee.ru/rss.xml" type="application/rss+xml" rel="alternate" title="Блог Ильи Барышева RSS Feed"/>
+</head>
+
+<body>
+
+<div class="container-fluid all-content">
+    <div class="row">
+        <header class="site-title span8 offset4">
+            <h1 class="site-title-main"><a href="http://codecoffee.ru">Блог Ильи Барышева</a></h1>
+            <span class="site-title-sub">О веб-разработке и не только…</span>
+        </header>
+
+        <div class="span8" id="content">
+<section id="content">
+    <article class="article">
+        <header>
+            <h1>
+                Боремся с Clickjacking
+            </h1>
+        </header>
+        <div class="entry-content">
+        <h3>Что такое clickjacking</h3>
+<p>Clickjacking - относительно новый и не очень широко известный тип атак
+на веб-сайты. Его суть в том, что пользователь, совершая клик на
+специально сформированной странице злоумышленника, на самом деле кликает
+по ссылке на совершенно другом сайте. Это может быть использовано как
+для относительно безобидных накруток голосований (например, <a href="http://shiflett.org/blog/2009/feb/twitter-dont-click-exploit">ретвитов</a>
+или <a href="http://erickerr.com/like-clickjacking">лайков</a>), так и более разрушительных вещей, главное, чтобы для
+этого требовался щелчок мыши.</p>
+<h3>Как это работает</h3>
+<p>Атакуемый сайт оборачивается в прозрачный ифрейм. Поверх него
+располагают какую-нибудь привлекательную ссылку, на которую захочет
+кликнуть «жертва» (при атаке на твитер в 2009 такой приманкой стала
+кнопка c текстом «Don't click»). Теперь вместо клика на неё будет
+происходить клик в ифрейме (так как он находится поверх кнопки).</p>
+<h3><a href="/demos/clickjacking/">Демонстрация кликджекинга</a></h3>
+<p>(абсолютно безвредно) Замечу, что защита от clickjacking совершенно
+иная, чем от CSRF, хотя цели злоумышленников в обоих атаках - заставить
+пользователя совершить запрос к сайту под своими правами.</p>
+<h3>Защищаемся через javascript</h3>
+<p>Самый простой способ - сделать редирект с помощью js, если сайт открыт в
+ифрейме (<a href="http://prophet.ru/demos/clickjacking/attacker_simple_defence.php">пример</a>):</p>
+<div class="highlight"><pre><span class="k">if</span><span class="p">(</span><span class="n">top</span><span class="err"> </span><span class="o">!=</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">top</span><span class="p">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">location</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>К сожалению, это код неуниверсален, существуют несколько способов его
+обхода разной степени изощрённости и применимости в браузерах. Подробнее
+можно почитать в исследовании <a href="http://crypto.stanford.edu/~dabo/pubs/papers/framebust.pdf">Busting Frame Busting: a Study of
+Clickjacking Vulnerabilities on Popular Sites</a>.</p>
+<h3>Защищаемся через заголовки</h3>
+<p>В дополнение к предыдущему методу, разработчики браузеров ввели новый
+заголовок ответа сервера <a href="https://developer.mozilla.org/en/The_X-FRAME-OPTIONS_response_header">X-Frame-Options</a>. Он позволяет не отображать
+сайт, если он загружается c другого домена через ифрейм. Пример настроек
+для Apache и nginx:</p>
+<div class="highlight"><pre><span class="n">Header</span> <span class="n">always</span> <span class="n">append</span> <span class="n">X</span><span class="o">-</span><span class="n">Frame</span><span class="o">-</span><span class="n">Options</span> <span class="n">SAMEORIGIN</span>
+
+<span class="n">add_header</span> <span class="n">X</span><span class="o">-</span><span class="n">Frame</span><span class="o">-</span><span class="n">Options</span> <span class="n">SAMEORIGIN</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Работает в IE 8.0+, FF 3.6.9+, Opera 10.50+, Safari 4.0+ и Chrome 4.1+,
+на момент написания поста по рунету это более 70% пользователей.</p>
+<p>В новой версии Django 1.4 для добавления этого заголовка есть настраиваемый
+<a href="https://docs.djangoproject.com/en/dev/ref/clickjacking/">XFrameOptionsMiddleware</a>.</p>
+<p><a href="http://www.owasp.org/index.php/Clickjacking">Подробно про Clickjacking</a> на сайте Open Web Application Security Project.</p>
+        </div>
+        <div class="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+               var disqus_identifier = "2011/08/boremsia-s-clickjacking/";
+               (function() {
+                    var dsq = document.createElement('script');
+                    dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = 'http://ilyabaryshev.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] ||
+                     document.getElementsByTagName('body')[0]).appendChild(dsq);
+              })();
+            </script>
+        </div>
+    </article>
+</section>
+        </div>
+
+        <div class="span4" id="sidebar">
+<div class="twitter-widget">
+<a class="twitter-timeline" href="https://twitter.com/coagulant"
+   data-widget-id="246305220399861761">Твитер @coagulant</a>
+</div>
+<script>!function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "http://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }
+}(document, "script", "twitter-wjs");</script>        </div>
+
+    </div>
+
+    <hr>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'ilyabaryshev';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+<script src="http://codecoffee.ru/theme/js/jquery-1.7.2.min.js"></script>
+<script src="http://codecoffee.ru/theme/js/bootstrap.min.js"></script>
+</body>
+</html>

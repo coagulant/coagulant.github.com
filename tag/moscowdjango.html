@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Блог Ильи Барышева - moscowdjango</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Илья Барышев">
+
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://codecoffee.ru/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="http://codecoffee.ru/theme/css/pygments.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://codecoffee.ru/theme/css/my.css" type="text/css"/>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="http://codecoffee.ru/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="http://codecoffee.ru/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="http://codecoffee.ru/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="http://codecoffee.ru/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="http://codecoffee.ru/rss.xml" type="application/rss+xml" rel="alternate" title="Блог Ильи Барышева RSS Feed"/>
+</head>
+
+<body>
+
+<div class="container-fluid all-content">
+    <div class="row">
+        <header class="site-title span8 offset4">
+            <h1 class="site-title-main"><a href="http://codecoffee.ru">Блог Ильи Барышева</a></h1>
+            <span class="site-title-sub">О веб-разработке и не только…</span>
+        </header>
+
+        <div class="span8" id="content">
+        <article class="article">
+            <h2><a href="http://codecoffee.ru/2013/02/python3-moscowdjango/">Про то как я Moscowdjango на Python 3 портировал</a></h2>
+            <span class="article-date">12 February 2013</span>
+            <div class="summary"><p>В январе удалось вновь выступить на Moscow Django. <a href="http://moscowdjango.ru/meetup/9/whats-new-in-django15/">Доклад про новинки пока ещё не вышедшего Django 1.5</a>
+оказался намного динамичней и бодрей прошлогоднего дебюта <a href="http://moscowdjango.ru/meetup/2/whats-new-in-django-14/">про 1.4</a>. По ссылкам можно в этом
+убедиться воочию.</p>
+<p>Как ни странно, в этот раз важных фич совсем немного, а ведь в прошлый раз их хватило,
+чтобы написать целый <a href="http://blog.futurecolors.ru/2012/04/django-14.html">цикл из 8 статей в блоге Future Colors</a>. В сухом остатке настраиваемая
+модель пользователя и небольшие улучшения в ORM и шаблонах. Про всё это уже многие написали. Даже <a href="http://blog.e0ne.info/post/Django-15-Release-Candidate.aspx">про
+минорные</a>, но от того не менее приятные новинки. Но самое главное, это, конечно же, поддежка python 3.2+.</p>
+<h3>Всё плохо?</h3>
+<p>После <a href="http://moscowdjango.ru/meetup/8/whats-new-python3/">доклада Павла Зиновкина</a> про то, как они пробовали перевести на python 3 один
+из своих проектов, у меня сложилось какое-то пессимистическое впечателние.
+Вывод был примерно таков: «Ситуация с библиотеками не позволяет
+использовать Python 3», а иными словами, пока не готово для продакшена.
+Не удалось завести django-celery под py3k, а стало быть запускать даже в стейджинг такое нельзя.
+Но ведь это не повод отчаиваться :) Возникло желание продемонстрировать, что некоторые проекты уже сейчас
+можно перевести на трёшку. Кандидата не пришлось долго искать: <a href="http://moscowdjango.ru/">сайт Moscow Django</a>
+для этого отлично подошёл.</p>
+<h3>Портируем на счёт три</h3>
+<p>Если кода немного, то портирование на python 3 обычно более-менее тривиально. Особенно помогает
+понимание того, что изменилось. А более всего осознание <a href="http://nedbatchelder.com/text/unipain.html">разницы между юникодом и строками</a>.
+В своём выступлении я рекомендовал книжку <a href="http://python3porting.com/">Porting to Python 3</a> и библиотку <a href="http://pythonhosted.org/six/">six</a>, которая
+де-факто стала стандартом разработки софта сразу под 2.x и 3.x. Этот подход избрали авторы множества
+известных мне библиотек, и не напрасно. Я считаю, что это намного проще в поддержке, чем 2to3
+и уж точно удобней, чем писать свои слои абстракции для совместимости.</p>
+<p>Для начала надо было решить, как завести свеженький питон на Хероку, где хостится MoscowDjango.
+К счастью, до того, как я погрузился в особенности устройства местных билдпаков,
+Kenneth Reitz анонсировал официальную поддержку всех актуальных версий питона на Хероку.
+Оставалось адаптировать код сайта и все зависимости.</p>
+<p>Поскольку код сайта достаточно компактен, большую часть времени заняли чужие библиотеки.
+Из <a href="https://github.com/futurecolors/moscowdjango/issues/64">21 пакета</a> лишь 7 уже могли запускаться под py3k, ещё для 6 нашлись рабочие форки, а ещё 3 я спортировал сам.
+Стоит отметить, что пакеты без тестов или хорошего покрытия портировать на python 3 крайне тяжело,
+а иногда даже невозможно. Это ещё один достаточно весомый довод в пользу написания тестов для
+вашего проекта.</p>
+<h3>Ложка дёгтя</h3>
+<p>Больше всего проблем доставила <a href="https://crate.io/packages/django-storages/">django-storages</a>, с помощью которой осуществляется заливка
+медиа-файлов на амазоновский s3. Выкинуть её полностью или заменить аналогом не получилось,
+а по-честному спортировать в короткий срок нереально из-за зависимости на внушительный <a href="https://crate.io/packages/boto/">boto</a>,
+до сих пор возглавляющий <a href="http://python3wos.appspot.com/">python 3 wall of shame</a>. Пришлось вытащить на свет
+deprecated версию python API от амазона бородатого года под python 2.4 и кое-как приспособить для
+своих нужд.</p>
+<p>К сожалению, перевести все-все зависимости на новую версию языка не удалось из-за временных
+ограничений (хотел успеть к докладу). За бортом прогресса плещутся любимые django-debug-toolbar и
+django-admin-sso, ожидая своей очереди. Но и без них сайт прекрасно работает, а никто и не заметил,
+что они были.</p>
+<h3>Выводы</h3>
+<p>Итого, меньше, чем за месяц (в свободное время) получилось запустить в продакшене небольшой <a href="http://moscowdjango.ru/">сайт на
+Django 1.5c1</a>. Конечно, это никакое не достижение, просто иллюстрация тенденции: того, что авторы
+библиотек всё больше с каждым годом смотрят в сторону третей версии языка. И скоро наступит момент,
+когда вопрос, стартовать ли новый проект на python 3 перестанет быть лишь уделом энтузиастов.</p>
+<p>Уже сейчас каждый, кто нашёл для себя что-то интересное в python 3, может начать
+помогать сообществу портировать библиотеки. Вот такой вывод я хотел бы видеть в докладе.</p></div>
+<div class="article-tags">
+    <i class="icon-tag"></i>
+	<a href="http://codecoffee.ru/tag/python.html">python</a>
+	<a href="http://codecoffee.ru/tag/konferentsii.html">конференции</a>
+	<a href="http://codecoffee.ru/tag/moscowdjango.html">moscowdjango</a>
+</div>
+            <a class="comments-link" href="http://codecoffee.ru/2013/02/python3-moscowdjango/#disqus_thread">Комментарии</a>
+        </article>
+        <hr />
+        <article class="article">
+            <h2><a href="http://codecoffee.ru/2012/10/pro-prezentatsii/">Про презентации</a></h2>
+            <span class="article-date">25 October 2012</span>
+            <div class="summary"><p>На <a href="http://moscowdjango.ru/meetups/7/">Moscow Django Meetup 6</a> рассказал
+про свои взгляды на тестирование и поделился несколькими нехитрыми советами и инструментами.
+Всем неравнодушным к совершенствованию качества кода рекомендую.
+А в особенности пишущим на python и Django, но надеюсь и остальным понравится.</p>
+<p>Пока что доступны слайды, но вскоре и видео подоспеет:</p>
+<div style="height:500px; margin-bottom: 20px;">
+<script async class="speakerdeck-embed" data-id="5087e55307a206000204d609" data-ratio="1.7777777777777777"
+ src="http://speakerdeck.com/assets/embed.js"></script>
+</div>
+
+<h3>Опыт докладчика</h3>
+<p>За этот год я выступил уже 3 раза на Moscow Django: в феврале рассказал про
+<a href="https://speakerdeck.com/coagulant/chto-novogho-v-django-1-dot-4">новинки Django 1.4</a>, в июле про <a href="https://speakerdeck.com/coagulant/django-i-continuous-integration">Continuous Integration</a>.
+Мотивация делать доклады такая же что и писать в блог: выкристаллизовать свои
+собственные знания в первую очередь. Чтобы объяснить что-то другим людям,
+надо самому это прекрасно понимать и разбираться. Советую попробовать, вам тоже
+может понравиться. Ну и приятные побочные эффекты никто не отменял.</p>
+<h3>Советы самому себе полгода назад</h3>
+<p>Размер шрифта как можно больше, переборщить не получится.<br/>
+Не нужно много текста, только самая суть: остальное можно рассказать.<br/>
+Списки должны появляться по пунктам, а не сразу.<br/>
+А лучше всего сделать по слайду на каждый пункт.<br/>
+Слайдов не может быть слишком много, нельзя экономить на слайдах.<br/>
+Научись пользоваться кликером, а лучше ещё и лазрной указкой, если на слайде код.<br/>
+Раскрашивай код на слайдах, если кода много. Но лучше меньше кода!<br/>
+Код на слайдах должен быть моноширинным, легочитаемым шрифтом.<br/>
+Присылай слайды организаторам заранее, лучше ещё и бэкап в формате PDF.<br/>
+Пиши комментарии докладчика и пользуйся ими во время рассказа.<br/></p>
+<p>Не буду утверждать, что все советы я сам смог выполнить, но я на пути к этому.</p>
+<p>P.S. Совет тем, кто не знает чем подсвечивать код в презентациях: я пользуюсь хорошей
+библиотекой <a href="http://softwaremaniacs.org/soft/highlight/">highligh.js</a> и копирую html код прямо на слайд Keynote.
+Для этого я сделал небольшой <a href="http://jsfiddle.net/gzUey/">плейграунд на jsfiddle</a>. Может быть и вам он пригодится.</p></div>
+<div class="article-tags">
+    <i class="icon-tag"></i>
+	<a href="http://codecoffee.ru/tag/python.html">python</a>
+	<a href="http://codecoffee.ru/tag/konferentsii.html">конференции</a>
+	<a href="http://codecoffee.ru/tag/moscowdjango.html">moscowdjango</a>
+</div>
+            <a class="comments-link" href="http://codecoffee.ru/2012/10/pro-prezentatsii/#disqus_thread">Комментарии</a>
+        </article>
+        <hr />
+
+        </div>
+
+        <div class="span4" id="sidebar">
+<div class="twitter-widget">
+<a class="twitter-timeline" href="https://twitter.com/coagulant"
+   data-widget-id="246305220399861761">Твитер @coagulant</a>
+</div>
+<script>!function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "http://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }
+}(document, "script", "twitter-wjs");</script>        </div>
+
+    </div>
+
+    <hr>
+</div>
+
+<script type="text/javascript">
+    var disqus_shortname = 'ilyabaryshev';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+
+<script src="http://codecoffee.ru/theme/js/jquery-1.7.2.min.js"></script>
+<script src="http://codecoffee.ru/theme/js/bootstrap.min.js"></script>
+</body>
+</html>

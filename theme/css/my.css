@@ -1,0 +1,118 @@
+.all-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#sidebar {
+    padding-left: 20px;
+}
+
+.site-title {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.site-title a {
+    color: black;
+    text-decoration: none;
+}
+.site-title a:hover, a:hover:visited {
+    color: black;
+}
+.site-title a:visited {
+    color: black;
+}
+
+.site-title-main {
+    font-family: 'Play', sans-serif;
+}
+
+.site-title-sub {
+    line-height: 30px;
+    font-size: 14px;
+    font-family: Arial, serif;
+    font-style: italic;
+}
+
+a {
+    color: #06C;
+    text-decoration: underline;
+}
+a:hover, a:hover:visited {
+    color: #ff4500;
+}
+a:visited {
+    color: #800080;
+}
+
+h1 {
+    font-weight: normal;
+    font-size: 40px;
+}
+
+.article h1 {
+    font-family: 'Cuprum', sans-serif;
+    font-weight: normal;
+    font-size: 36px;
+    line-height: 48px;
+}
+
+.article h2 {
+    font-family: 'Cuprum', sans-serif;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 48px;
+}
+
+.article h2 a {
+    color: #000000;
+}
+
+.article h3 {
+    font-family: Georgia, 'Bitstream Charter', serif;
+    font-size: 26px;
+    line-height: 36px;
+    font-weight: normal;
+    margin-top: 10px;
+}
+
+.article h4 {
+    font-family: Georgia, 'Bitstream Charter', serif;
+    font-size: 18px;
+    line-height: 27px;
+}
+
+.article-date {
+    color: #888;
+}
+
+.article-tags a {
+    color: gray;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+p {
+    font-family: Georgia, 'Bitstream Charter', serif;
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+blockquote {
+    margin-left: 30px;
+}
+
+blockquote p {
+    font-style: italic;
+    font-size: 18px;
+    line-height: 25px;
+}
+
+.twitter-widget {
+    opacity: 0.65;
+}
+.comments-link {
+    margin-top: 20px;
+    display: inline-block;
+}
